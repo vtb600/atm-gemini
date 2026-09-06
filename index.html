@@ -479,7 +479,7 @@
         <div id="globalSettingsContent" style="display: block;">
             <div class="form-row">
                 <div class="form-group">
-                    <label for="global-apiKey">Mistral API Key (dùng chung):</label>
+                    <label for="global-apiKey">Gemini API Key (dùng chung):</label>
                     <div style="display: flex; gap: 0.5rem;">
                         <input type="password" id="global-apiKey" placeholder="Nhập API key (được lưu lại)" style="flex: 1;">
                         <button class="btn btn-secondary" onclick="toggleApiKeyVisibility()" title="Hiện/ẩn API key">
@@ -489,7 +489,7 @@
                     </div>
                     <div class="api-hint">
                         API key được lưu trong trình duyệt (localStorage). Dùng chung cho cả Tab CCCD và Tab SMS.
-                        <a href="https://console.mistral.ai/" target="_blank">Lấy key tại console.mistral.ai</a>
+                        <a href="https://aistudio.google.com/apikey" target="_blank">Lấy key tại aistudio.google.com</a>
                     </div>
                 </div>
             </div>
@@ -530,8 +530,8 @@
                     <label>Engine OCR:</label>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="cccd-engine" value="mistral" checked>
-                            <span>Mistral AI (Khuyến dụng)</span>
+                            <input type="radio" name="cccd-engine" value="gemini" checked>
+                            <span>Google Gemini (Khuyến dụng)</span>
                         </label>
                         <label class="radio-label">
                             <input type="radio" name="cccd-engine" value="tesseract">
@@ -542,7 +542,7 @@
             </div>
             <div class="form-row">
                 <div class="form-group" id="cccd-apiKeyGroup">
-                    <label for="cccd-apiKey">Mistral API Key:</label>
+                    <label for="cccd-apiKey">Gemini API Key:</label>
                     <input type="text" id="cccd-apiKey" placeholder="Để trống để dùng API key chung">
                     <div class="api-hint">Để trống để sử dụng API key chung ở trên, hoặc nhập key riêng cho tab này.</div>
                 </div>
@@ -656,8 +656,8 @@
                     <label>Engine OCR:</label>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="sms-engine" value="mistral" checked>
-                            <span>Mistral AI (Khuyến dụng)</span>
+                            <input type="radio" name="sms-engine" value="gemini" checked>
+                            <span>Google Gemini (Khuyến dụng)</span>
                         </label>
                         <label class="radio-label">
                             <input type="radio" name="sms-engine" value="tesseract">
@@ -668,7 +668,7 @@
             </div>
             <div class="form-row">
                 <div class="form-group" id="sms-apiKeyGroup">
-                    <label for="sms-apiKey">Mistral API Key:</label>
+                    <label for="sms-apiKey">Gemini API Key:</label>
                     <input type="text" id="sms-apiKey" placeholder="Để trống để dùng API key chung">
                     <div class="api-hint">Để trống để sử dụng API key chung ở trên, hoặc nhập key riêng cho tab này.</div>
                 </div>
@@ -943,7 +943,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 // ==================== GLOBAL API KEY MANAGEMENT ====================
-const API_KEY_STORAGE_KEY = 'omniroute_mistral_api_key';
+const API_KEY_STORAGE_KEY = 'omniroute_gemini_api_key';
+const GEMINI_MODEL = 'gemini-3.6-flash';
 
 function loadApiKey() {
     const savedKey = localStorage.getItem(API_KEY_STORAGE_KEY) || '';
@@ -1018,6 +1019,11 @@ function downloadFile(content, filename, mimeType) {
     URL.revokeObjectURL(url);
 }
 
+function base64FromDataUrl(dataUrl) {
+    const commaIndex = String(dataUrl || '').indexOf(',');
+    return commaIndex >= 0 ? dataUrl.substring(commaIndex + 1) : dataUrl;
+}
+
 // ==================== CCCD EXTRACTION ====================
 const CCCD_FIELD_LABELS = {
     loai: 'Loại giấy tờ',
@@ -1041,7 +1047,7 @@ document.getElementById('cccd-imageInput').addEventListener('change', function(e
 
 document.querySelectorAll('input[name="cccd-engine"]').forEach(radio => {
     radio.addEventListener('change', function() {
-        document.getElementById('cccd-apiKeyGroup').style.display = this.value === 'mistral' ? 'block' : 'none';
+        document.getElementById('cccd-apiKeyGroup').style.display = this.value === 'gemini' ? 'block' : 'none';
     });
 });
 
@@ -1066,8 +1072,8 @@ async function cccd_startExtraction() {
     const apiKey = getEffectiveApiKey(tabApiKey);
     const simpleMode = document.getElementById('cccd-simpleMode').checked;
 
-    if (engine === 'mistral' && !apiKey) {
-        alert('Vui lòng nhập Mistral API Key (ở mục Cấu hình chung hoặc Tab CCCD)!');
+    if (engine === 'gemini' && !apiKey) {
+        alert('Vui lòng nhập Gemini API Key (ở mục Cấu hình chung hoặc Tab CCCD)!');
         return;
     }
 
@@ -1122,20 +1128,20 @@ async function cccd_startExtraction() {
 }
 
 async function cccd_extractFromImage(file, engine, apiKey) {
-    if (engine !== 'mistral') {
-        throw new Error('Tesseract cần backend server. Vui lòng sử dụng Mistral API.');
+    if (engine !== 'gemini') {
+        throw new Error('Tesseract cần backend server. Vui lòng sử dụng Gemini API.');
     }
 
     if (isPdfFile(file)) {
         const dataUrl = await convertPdfFileToImageDataUrl(file);
-        return await cccd_callMistralAPI(dataUrl, 'image/png', apiKey);
+        return await cccd_callGeminiAPI(dataUrl, 'image/png', apiKey);
     }
 
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = async function(e) {
             try {
-                const result = await cccd_callMistralAPI(e.target.result, file.type, apiKey);
+                const result = await cccd_callGeminiAPI(e.target.result, file.type, apiKey);
                 resolve(result);
             } catch (error) {
                 reject(error);
@@ -1146,7 +1152,7 @@ async function cccd_extractFromImage(file, engine, apiKey) {
     });
 }
 
-async function cccd_callMistralAPI(base64Data, mimeType, apiKey) {
+async function cccd_callGeminiAPI(base64Data, mimeType, apiKey) {
     const prompt = `Đây là ảnh chụp màn hình gồm 2 phần:
 (1) Một đoạn text tóm tắt thông tin Căn Cước/Căn Cước Công Dân (CCCD) ở đầu ảnh, có các nhãn:
     "Số cccd:", "Số cmnd cũ:", "Họ và tên:", "Ngày sinh:", "Giới tính:", "Địa chỉ:", "Ngày cấp mới:"
@@ -1176,35 +1182,36 @@ Yêu cầu:
     + Nếu tiêu đề trên thẻ là "CĂN CƯỚC" (kèm dòng tiếng Anh "Identity Card", không có chữ "Công dân") thì trả về kết quả là "BO CONG AN".
     + Nếu không xác định được thì để giá trị là chuỗi rỗng "".`;
 
-    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            model: 'mistral-small-latest',
-            temperature: 0,
-            response_format: { type: 'json_object' },
-            messages: [
+            contents: [
                 {
                     role: 'user',
-                    content: [
-                        { type: 'text', text: prompt },
-                        { type: 'image_url', image_url: { url: base64Data } }
+                    parts: [
+                        { text: prompt },
+                        { inline_data: { mime_type: mimeType, data: base64FromDataUrl(base64Data) } }
                     ]
                 }
-            ]
+            ],
+            generationConfig: {
+                temperature: 0,
+                response_mime_type: 'application/json'
+            }
         })
     });
 
     if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Mistral API lỗi ${response.status}: ${errorText.substring(0, 200)}`);
+        throw new Error(`Gemini API lỗi ${response.status}: ${errorText.substring(0, 200)}`);
     }
 
     const data = await response.json();
-    let content = data.choices[0].message.content;
+    const parts = data?.candidates?.[0]?.content?.parts || [];
+    let content = parts.map(p => p.text || '').join('').trim();
 
     content = content.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
 
@@ -1341,7 +1348,7 @@ document.getElementById('sms-imageInput').addEventListener('change', function(e)
 
 document.querySelectorAll('input[name="sms-engine"]').forEach(radio => {
     radio.addEventListener('change', function() {
-        document.getElementById('sms-apiKeyGroup').style.display = this.value === 'mistral' ? 'block' : 'none';
+        document.getElementById('sms-apiKeyGroup').style.display = this.value === 'gemini' ? 'block' : 'none';
     });
 });
 
@@ -1366,8 +1373,8 @@ async function sms_startExtraction() {
     const apiKey = getEffectiveApiKey(tabApiKey);
     const simpleMode = document.getElementById('sms-simpleMode').checked;
 
-    if (engine === 'mistral' && !apiKey) {
-        alert('Vui lòng nhập Mistral API Key (ở mục Cấu hình chung hoặc Tab SMS)!');
+    if (engine === 'gemini' && !apiKey) {
+        alert('Vui lòng nhập Gemini API Key (ở mục Cấu hình chung hoặc Tab SMS)!');
         return;
     }
 
@@ -1422,13 +1429,13 @@ async function sms_startExtraction() {
 }
 
 async function sms_extractFromImage(file, engine, apiKey) {
-    if (engine !== 'mistral') {
-        throw new Error('Tesseract cần backend server. Vui lòng sử dụng Mistral API.');
+    if (engine !== 'gemini') {
+        throw new Error('Tesseract cần backend server. Vui lòng sử dụng Gemini API.');
     }
 
     if (isPdfFile(file)) {
         const dataUrl = await convertPdfFileToImageDataUrl(file);
-        const text = await sms_callMistralAPI(dataUrl, 'image/png', apiKey);
+        const text = await sms_callGeminiAPI(dataUrl, 'image/png', apiKey);
         return sms_extractFields(text);
     }
 
@@ -1436,7 +1443,7 @@ async function sms_extractFromImage(file, engine, apiKey) {
         const reader = new FileReader();
         reader.onload = async function(e) {
             try {
-                const text = await sms_callMistralAPI(e.target.result, file.type, apiKey);
+                const text = await sms_callGeminiAPI(e.target.result, file.type, apiKey);
                 const result = sms_extractFields(text);
                 resolve(result);
             } catch (error) {
@@ -1448,42 +1455,39 @@ async function sms_extractFromImage(file, engine, apiKey) {
     });
 }
 
-async function sms_callMistralAPI(base64Data, mimeType, apiKey) {
+async function sms_callGeminiAPI(base64Data, mimeType, apiKey) {
     const prompt = `Đây là ảnh chụp tin nhắn SMS trên điện thoại.
 Hãy chép lại NGUYÊN VĂN toàn bộ chữ (bao gồm số điện thoại, các dãy số, các từ 'Tttb', 'thuê bao', v.v.) xuất hiện trong ảnh, không diễn giải, không tóm tắt, không bỏ sót bất kỳ dòng nào.`;
 
-    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            model: 'mistral-small-latest',
-            temperature: 0,
-            messages: [
+            contents: [
                 {
                     role: 'user',
-                    content: [
-                        { type: 'text', text: prompt },
-                        { type: 'image_url', image_url: { url: base64Data } }
+                    parts: [
+                        { text: prompt },
+                        { inline_data: { mime_type: mimeType, data: base64FromDataUrl(base64Data) } }
                     ]
                 }
-            ]
+            ],
+            generationConfig: {
+                temperature: 0
+            }
         })
     });
 
     if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Mistral API lỗi ${response.status}: ${errorText.substring(0, 200)}`);
+        throw new Error(`Gemini API lỗi ${response.status}: ${errorText.substring(0, 200)}`);
     }
 
     const data = await response.json();
-    let text = data.choices[0].message.content;
-
-    if (Array.isArray(text)) {
-        text = text.map(block => block.text || '').join('\n');
-    }
+    const parts = data?.candidates?.[0]?.content?.parts || [];
+    const text = parts.map(p => p.text || '').join('').trim();
 
     return text || '';
 }
