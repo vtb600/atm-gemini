@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trích xuất & Ghép dữ liệu CCCD/SMS</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --success: #16a34a;
+            --error: #dc2626;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .tab-btn .tab-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+
+        /* Form Elements */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        input[type="file"] {
+            cursor: pointer;
+            border: 2px dashed var(--border);
+        }
+
+        input[type="file"]:hover {
+            border-color: var(--primary);
+        }
+
+        .file-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .file-loaded {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* Radio & Checkbox */
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            padding: 0.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .radio-label,
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-weight: 400;
+            font-size: 0.9rem;
+        }
+
+        input[type="radio"],
+        input[type="checkbox"] {
+            accent-color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #15803d;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        /* Progress */
+        .progress-container {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* Log */
+        .log-container {
+            max-height: 150px;
+            overflow-y: auto;
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .log-entry {
+            margin-bottom: 0.25rem;
+        }
+
+        .log-success { color: #4ade80; }
+        .log-error { color: #f87171; }
+        .log-info { color: #93c5fd; }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Results */
+        .results-container {
+            display: none;
+        }
+
+        .results-container.active {
+            display: block;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 1rem;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 0.6rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg);
+            font-weight: 600;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: rgba(37, 99, 235, 0.03);
+        }
+
+        .status-ok {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .status-error {
+            color: var(--error);
+            font-weight: 500;
+        }
+
+        .status-warning {
+            color: var(--warning);
+            font-weight: 500;
+        }
+
+        .empty-value {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(37, 99, 235, 0.05);
+            border-left: 3px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1rem;
+        }
+
+        .info-box h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .info-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .api-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .api-hint a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .api-hint a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .tabs {
+                justify-content: center;
+            }
+
+            .tab-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>🚀 ATM Extractor</h1>
+        <p>Trích xuất thông tin CCCD, SMS và ghép dữ liệu tự động</p>
+    </div>
+
+    <!-- Global Settings -->
+    <div class="card" style="margin-bottom: 1rem;">
+        <div class="card-title" style="cursor: pointer;" onclick="toggleGlobalSettings()">
+            <span>🔑</span>
+            <span>Cấu hình chung</span>
+            <span id="globalSettingsArrow" style="margin-left: auto; font-size: 0.8rem;">▼</span>
+        </div>
+        <div id="globalSettingsContent" style="display: block;">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="global-apiKey">Mistral API Key (dùng chung):</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="password" id="global-apiKey" placeholder="Nhập API key (được lưu lại)" style="flex: 1;">
+                        <button class="btn btn-secondary" onclick="toggleApiKeyVisibility()" title="Hiện/ẩn API key">
+                            <span id="apiKeyToggleIcon">👁️</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="saveApiKey()">💾 Lưu</button>
+                    </div>
+                    <div class="api-hint">
+                        API key được lưu trong trình duyệt (localStorage). Dùng chung cho cả Tab CCCD và Tab SMS.
+                        <a href="https://console.mistral.ai/" target="_blank">Lấy key tại console.mistral.ai</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="cccd">
+            <span class="tab-icon">🆔</span>
+            <span>Trích xuất CCCD</span>
+        </button>
+        <button class="tab-btn" data-tab="sms">
+            <span class="tab-icon">📱</span>
+            <span>Trích xuất SMS</span>
+        </button>
+        <button class="tab-btn" data-tab="merge">
+            <span class="tab-icon">🔗</span>
+            <span>Ghép dữ liệu</span>
+        </button>
+    </div>
+
+    <!-- ==================== TAB 1: CCCD ==================== -->
+    <div class="tab-content active" id="tab-cccd">
+        <div class="card">
+            <div class="card-title">📁 Chọn ảnh CCCD</div>
+            <div class="form-group">
+                <label for="cccd-imageInput">Chọn file ảnh hoặc thư mục ảnh CCCD:</label>
+                <input type="file" id="cccd-imageInput" multiple accept=".jpg,.jpeg,.png,.webp,.bmp,.tiff,.pdf">
+                <div class="file-info">Hỗ trợ: JPG, PNG, WebP, BMP, TIFF, PDF. Có thể chọn nhiều file cùng lúc. File PDF sẽ tự động được chuyển thành ảnh trước khi xử lý.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">⚙️ Cấu hình OCR</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Engine OCR:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="cccd-engine" value="mistral" checked>
+                            <span>Mistral AI (Khuyến dụng)</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="cccd-engine" value="tesseract">
+                            <span>Tesseract (Offline)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" id="cccd-apiKeyGroup">
+                    <label for="cccd-apiKey">Mistral API Key:</label>
+                    <input type="text" id="cccd-apiKey" placeholder="Để trống để dùng API key chung">
+                    <div class="api-hint">Để trống để sử dụng API key chung ở trên, hoặc nhập key riêng cho tab này.</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="cccd-simpleMode">
+                    <span>Chế độ đơn giản - Chỉ xuất 9 cột dữ liệu</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🚀 Thực hiện</div>
+            <div class="actions">
+                <button class="btn btn-primary" id="cccd-extractBtn" onclick="cccd_startExtraction()">
+                    <span>▶️</span> Bắt đầu trích xuất
+                </button>
+                <button class="btn btn-secondary" onclick="cccd_clearAll()">
+                    <span>🗑️</span> Xóa tất cả
+                </button>
+            </div>
+            <div class="progress-container" id="cccd-progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="cccd-progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text" id="cccd-progressText">Đang xử lý...</div>
+            </div>
+            <div class="log-container" id="cccd-logContainer" style="display: none;"></div>
+        </div>
+
+        <div class="results-container" id="cccd-resultsContainer">
+            <div class="card">
+                <div class="card-title">📊 Kết quả trích xuất CCCD</div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="cccd-statTotal">0</div>
+                        <div class="stat-label">Tổng số ảnh</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cccd-statSuccess">0</div>
+                        <div class="stat-label">Thành công</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cccd-statFailed">0</div>
+                        <div class="stat-label">Thất bại</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cccd-statFields">0</div>
+                        <div class="stat-label">Trường tìm thấy</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-success" onclick="cccd_downloadExcel()">
+                        <span>📥</span> Tải xuống CSV
+                    </button>
+                    <button class="btn btn-secondary" onclick="cccd_downloadJSON()">
+                        <span>📄</span> Tải xuống JSON
+                    </button>
+                    <button class="btn btn-secondary" onclick="cccd_copyToClipboard()">
+                        <span>📋</span> Copy dữ liệu
+                    </button>
+                </div>
+                <div class="table-wrapper">
+                    <table id="cccd-resultsTable">
+                        <thead>
+                            <tr id="cccd-tableHeader">
+                                <th>STT</th>
+                                <th>Tên file</th>
+                                <th>Số CCCD</th>
+                                <th>Số CMND cũ</th>
+                                <th>Họ và tên</th>
+                                <th>Ngày sinh</th>
+                                <th>Giới tính</th>
+                                <th>Địa chỉ</th>
+                                <th>Ngày cấp mới</th>
+                                <th>Có giá trị đến</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cccd-tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 2: SMS ==================== -->
+    <div class="tab-content" id="tab-sms">
+        <div class="info-box">
+            <h4>📌 Hướng dẫn sử dụng</h4>
+            <p>
+                Công cụ trích xuất <strong>Số điện thoại</strong> (số thuê bao đăng ký) và <strong>TTTB</strong> (mã tra cứu gói 1414)
+                từ ảnh chụp màn hình SMS. Hỗ trợ các nhà mạng: MobiFone, Viettel, Vinaphone...
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📁 Chọn ảnh SMS</div>
+            <div class="form-group">
+                <label for="sms-imageInput">Chọn file ảnh chụp màn hình SMS:</label>
+                <input type="file" id="sms-imageInput" multiple accept=".jpg,.jpeg,.png,.webp,.bmp,.tiff,.pdf">
+                <div class="file-info">Hỗ trợ: JPG, PNG, WebP, BMP, TIFF, PDF. Có thể chọn nhiều file cùng lúc. File PDF sẽ tự động được chuyển thành ảnh trước khi xử lý.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">⚙️ Cấu hình OCR</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Engine OCR:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="sms-engine" value="mistral" checked>
+                            <span>Mistral AI (Khuyến dụng)</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="sms-engine" value="tesseract">
+                            <span>Tesseract (Offline)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" id="sms-apiKeyGroup">
+                    <label for="sms-apiKey">Mistral API Key:</label>
+                    <input type="text" id="sms-apiKey" placeholder="Để trống để dùng API key chung">
+                    <div class="api-hint">Để trống để sử dụng API key chung ở trên, hoặc nhập key riêng cho tab này.</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="sms-simpleMode">
+                    <span>Chế độ đơn giản - Chỉ xuất 2 cột dữ liệu</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🚀 Thực hiện</div>
+            <div class="actions">
+                <button class="btn btn-primary" id="sms-extractBtn" onclick="sms_startExtraction()">
+                    <span>▶️</span> Bắt đầu trích xuất
+                </button>
+                <button class="btn btn-secondary" onclick="sms_clearAll()">
+                    <span>🗑️</span> Xóa tất cả
+                </button>
+            </div>
+            <div class="progress-container" id="sms-progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="sms-progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-text" id="sms-progressText">Đang xử lý...</div>
+            </div>
+            <div class="log-container" id="sms-logContainer" style="display: none;"></div>
+        </div>
+
+        <div class="results-container" id="sms-resultsContainer">
+            <div class="card">
+                <div class="card-title">📊 Kết quả trích xuất SMS</div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="sms-statTotal">0</div>
+                        <div class="stat-label">Tổng số ảnh</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="sms-statSuccess">0</div>
+                        <div class="stat-label">Thành công</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="sms-statFailed">0</div>
+                        <div class="stat-label">Thất bại</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="sms-statSDT">0</div>
+                        <div class="stat-label">Số điện thoại</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="sms-statTTTB">0</div>
+                        <div class="stat-label">TTTB</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-success" onclick="sms_downloadExcel()">
+                        <span>📥</span> Tải xuống CSV
+                    </button>
+                    <button class="btn btn-secondary" onclick="sms_downloadJSON()">
+                        <span>📄</span> Tải xuống JSON
+                    </button>
+                    <button class="btn btn-secondary" onclick="sms_copyToClipboard()">
+                        <span>📋</span> Copy dữ liệu
+                    </button>
+                </div>
+                <div class="table-wrapper">
+                    <table id="sms-resultsTable">
+                        <thead>
+                            <tr id="sms-tableHeader">
+                                <th>STT</th>
+                                <th>Tên file</th>
+                                <th>Số điện thoại</th>
+                                <th>TTTB</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sms-tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 3: MERGE ==================== -->
+    <div class="tab-content" id="tab-merge">
+        <div class="info-box">
+            <h4>📌 Cách hoạt động</h4>
+            <p>
+                Đọc <strong>so_dien_thoai</strong> từ file SMS (sms_ket_qua.json) và ghép vào file CCCD (cccd_ket_qua.json)
+                thông qua khóa VLOOKUP: <strong>tttb</strong> (trong file SMS) khớp với <strong>so_cccd</strong> hoặc <strong>so_cmnd_cu</strong> (trong file CCCD).
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span class="badge">1</span>
+                File SMS (sms_ket_qua.json)
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label" style="margin-bottom: 0.75rem;">
+                    <input type="checkbox" id="merge-useSmsTabData" onchange="toggleSmsDataSource()">
+                    <span><strong>Lấy dữ liệu từ Tab SMS</strong> (đã trích xuất ở Tab 2)</span>
+                </label>
+                <div id="merge-smsFileContainer">
+                    <label for="merge-smsFile">Hoặc chọn file JSON chứa dữ liệu SMS:</label>
+                    <input type="file" id="merge-smsFile" accept=".json">
+                </div>
+                <div class="file-info" id="merge-smsFileInfo">Chưa có dữ liệu</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span class="badge">2</span>
+                File CCCD (cccd_ket_qua.json)
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label" style="margin-bottom: 0.75rem;">
+                    <input type="checkbox" id="merge-useCccdTabData" onchange="toggleCccdDataSource()">
+                    <span><strong>Lấy dữ liệu từ Tab CCCD</strong> (đã trích xuất ở Tab 1)</span>
+                </label>
+                <div id="merge-cccdFileContainer">
+                    <label for="merge-cccdFile">Hoặc chọn file JSON chứa dữ liệu CCCD:</label>
+                    <input type="file" id="merge-cccdFile" accept=".json">
+                </div>
+                <div class="file-info" id="merge-cccdFileInfo">Chưa có dữ liệu</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🚀 Thực hiện</div>
+            <div class="actions">
+                <button class="btn btn-primary" id="merge-mergeBtn" onclick="merge_mergeData()">
+                    <span>🔗</span> Ghép dữ liệu
+                </button>
+                <button class="btn btn-secondary" onclick="merge_clearAll()">
+                    <span>🗑️</span> Xóa tất cả
+                </button>
+            </div>
+            <div class="log-container" id="merge-logContainer" style="display: none;"></div>
+        </div>
+
+        <div class="results-container" id="merge-resultsContainer">
+            <div class="card">
+                <div class="card-title">📊 Kết quả ghép dữ liệu</div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="merge-statTotal">0</div>
+                        <div class="stat-label">Tổng dòng CCCD</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="merge-statMatched">0</div>
+                        <div class="stat-label">Khớp SĐT</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="merge-statUnmatched">0</div>
+                        <div class="stat-label">Không khớp</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-success" onclick="merge_downloadExcel()">
+                        <span>📥</span> Tải xuống Excel (.xlsx)
+                    </button>
+                    <button class="btn btn-secondary" onclick="merge_downloadJSON()">
+                        <span>📄</span> Tải xuống JSON
+                    </button>
+                    <button class="btn btn-secondary" onclick="merge_copyToClipboard()">
+                        <span>📋</span> Copy dữ liệu
+                    </button>
+                </div>
+                <label class="checkbox-label" style="margin-top: 1rem;">
+                    <input type="checkbox" id="merge-showMatchedOnly">
+                    <span>Chỉ hiển thị các dòng đã khớp SĐT</span>
+                </label>
+                <div class="table-wrapper">
+                    <table id="merge-resultsTable">
+                        <thead>
+                            <tr id="merge-tableHeader">
+                                <th>STT</th>
+                                <th>Tên file</th>
+                                <th>Số CCCD</th>
+                                <th>Số CMND cũ</th>
+                                <th>Họ và tên</th>
+                                <th>Ngày sinh</th>
+                                <th>Giới tính</th>
+                                <th>Địa chỉ</th>
+                                <th>Ngày cấp mới</th>
+                                <th>Có giá trị đến</th>
+                                <th>Số điện thoại</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="merge-tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SheetJS Library -->
+<script src="lib/xlsx.full.min.js"></script>
+
+<!-- PDF.js Library (dùng để chuyển file PDF thành ảnh trước khi đưa vào OCR) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<script>
+if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+// ==================== PDF HELPER ====================
+function isPdfFile(file) {
+    return file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+}
+
+// Chuyển toàn bộ trang của 1 file PDF thành 1 ảnh PNG duy nhất (ghép các trang theo chiều dọc)
+async function convertPdfFileToImageDataUrl(file, scale = 2) {
+    if (!window.pdfjsLib) {
+        throw new Error('Không tải được thư viện PDF.js. Vui lòng kiểm tra kết nối mạng.');
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+    const pageCanvases = [];
+    let totalHeight = 0;
+    let maxWidth = 0;
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        pageCanvases.push(canvas);
+        totalHeight += canvas.height;
+        maxWidth = Math.max(maxWidth, canvas.width);
+    }
+
+    const combined = document.createElement('canvas');
+    combined.width = maxWidth;
+    combined.height = totalHeight;
+    const combinedCtx = combined.getContext('2d');
+    combinedCtx.fillStyle = '#ffffff';
+    combinedCtx.fillRect(0, 0, combined.width, combined.height);
+
+    let yOffset = 0;
+    pageCanvases.forEach(canvas => {
+        combinedCtx.drawImage(canvas, 0, yOffset);
+        yOffset += canvas.height;
+    });
+
+    return combined.toDataURL('image/png');
+}
+
+// ==================== TAB NAVIGATION ====================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // Remove active from all
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        // Add active to clicked
+        this.classList.add('active');
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+    });
+});
+
+// ==================== GLOBAL API KEY MANAGEMENT ====================
+const API_KEY_STORAGE_KEY = 'omniroute_mistral_api_key';
+
+function loadApiKey() {
+    const savedKey = localStorage.getItem(API_KEY_STORAGE_KEY) || '';
+    document.getElementById('global-apiKey').value = savedKey;
+    return savedKey;
+}
+
+function saveApiKey() {
+    const apiKey = document.getElementById('global-apiKey').value.trim();
+    if (apiKey) {
+        localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
+        alert('✓ Đã lưu API key thành công!');
+    } else {
+        localStorage.removeItem(API_KEY_STORAGE_KEY);
+        alert('Đã xóa API key đã lưu!');
+    }
+}
+
+function toggleApiKeyVisibility() {
+    const input = document.getElementById('global-apiKey');
+    const icon = document.getElementById('apiKeyToggleIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        icon.textContent = '👁️';
+    }
+}
+
+function toggleGlobalSettings() {
+    const content = document.getElementById('globalSettingsContent');
+    const arrow = document.getElementById('globalSettingsArrow');
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        arrow.textContent = '▼';
+    } else {
+        content.style.display = 'none';
+        arrow.textContent = '▶';
+    }
+}
+
+function getEffectiveApiKey(tabApiKey) {
+    // Priority: tab-specific key > global key
+    if (tabApiKey && tabApiKey.trim()) {
+        return tabApiKey.trim();
+    }
+    return localStorage.getItem(API_KEY_STORAGE_KEY) || '';
+}
+
+// Load API key on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadApiKey();
+});
+
+// ==================== COMMON FUNCTIONS ====================
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function downloadFile(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// ==================== CCCD EXTRACTION ====================
+const CCCD_FIELD_LABELS = {
+    loai: 'Loại giấy tờ',
+    so_cccd: 'Số CCCD',
+    so_cmnd_cu: 'Số CMND cũ',
+    ho_va_ten: 'Họ và tên',
+    ngay_sinh: 'Ngày sinh',
+    gioi_tinh: 'Giới tính',
+    dia_chi: 'Địa chỉ',
+    ngay_cap_moi: 'Ngày cấp mới',
+    co_gia_tri_den: 'Có giá trị đến'
+};
+const CCCD_FIELD_KEYS = Object.keys(CCCD_FIELD_LABELS);
+
+let cccd_selectedFiles = [];
+let cccd_extractedData = [];
+
+document.getElementById('cccd-imageInput').addEventListener('change', function(e) {
+    cccd_selectedFiles = Array.from(e.target.files);
+});
+
+document.querySelectorAll('input[name="cccd-engine"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.getElementById('cccd-apiKeyGroup').style.display = this.value === 'mistral' ? 'block' : 'none';
+    });
+});
+
+function cccd_log(message, type = 'info') {
+    const logContainer = document.getElementById('cccd-logContainer');
+    logContainer.style.display = 'block';
+    const entry = document.createElement('div');
+    entry.className = `log-entry log-${type}`;
+    entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    logContainer.appendChild(entry);
+    logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+async function cccd_startExtraction() {
+    if (cccd_selectedFiles.length === 0) {
+        alert('Vui lòng chọn ít nhất một file ảnh!');
+        return;
+    }
+
+    const engine = document.querySelector('input[name="cccd-engine"]:checked').value;
+    const tabApiKey = document.getElementById('cccd-apiKey').value.trim();
+    const apiKey = getEffectiveApiKey(tabApiKey);
+    const simpleMode = document.getElementById('cccd-simpleMode').checked;
+
+    if (engine === 'mistral' && !apiKey) {
+        alert('Vui lòng nhập Mistral API Key (ở mục Cấu hình chung hoặc Tab CCCD)!');
+        return;
+    }
+
+    const btn = document.getElementById('cccd-extractBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> Đang xử lý...';
+
+    document.getElementById('cccd-progressContainer').classList.add('active');
+    document.getElementById('cccd-logContainer').innerHTML = '';
+    document.getElementById('cccd-logContainer').style.display = 'block';
+
+    cccd_extractedData = [];
+
+    cccd_log(`Bắt đầu xử lý ${cccd_selectedFiles.length} ảnh với engine: ${engine}`, 'info');
+
+    for (let i = 0; i < cccd_selectedFiles.length; i++) {
+        const file = cccd_selectedFiles[i];
+        const progress = ((i + 1) / cccd_selectedFiles.length) * 100;
+
+        document.getElementById('cccd-progressFill').style.width = `${progress}%`;
+        document.getElementById('cccd-progressText').textContent = `Đang xử lý: ${file.name} (${i + 1}/${cccd_selectedFiles.length})`;
+
+        cccd_log(`[${i + 1}/${cccd_selectedFiles.length}] Xử lý: ${file.name}`, 'info');
+
+        try {
+            const fields = await cccd_extractFromImage(file, engine, apiKey);
+            cccd_extractedData.push({
+                ten_file: file.name,
+                ...fields,
+                trang_thai: 'OK'
+            });
+            cccd_log(`✓ Thành công: ${file.name}`, 'success');
+        } catch (error) {
+            const emptyFields = {};
+            CCCD_FIELD_KEYS.forEach(k => emptyFields[k] = '');
+            cccd_extractedData.push({
+                ten_file: file.name,
+                ...emptyFields,
+                trang_thai: `Lỗi: ${error.message}`
+            });
+            cccd_log(`✗ Lỗi: ${file.name} - ${error.message}`, 'error');
+        }
+    }
+
+    document.getElementById('cccd-progressText').textContent = 'Hoàn thành!';
+    cccd_log(`Hoàn thành xử lý ${cccd_selectedFiles.length} ảnh`, 'success');
+
+    cccd_displayResults(simpleMode);
+
+    btn.disabled = false;
+    btn.innerHTML = '<span>▶️</span> Bắt đầu trích xuất';
+}
+
+async function cccd_extractFromImage(file, engine, apiKey) {
+    if (engine !== 'mistral') {
+        throw new Error('Tesseract cần backend server. Vui lòng sử dụng Mistral API.');
+    }
+
+    if (isPdfFile(file)) {
+        const dataUrl = await convertPdfFileToImageDataUrl(file);
+        return await cccd_callMistralAPI(dataUrl, 'image/png', apiKey);
+    }
+
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const result = await cccd_callMistralAPI(e.target.result, file.type, apiKey);
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            }
+        };
+        reader.onerror = () => reject(new Error('Không thể đọc file'));
+        reader.readAsDataURL(file);
+    });
+}
+
+async function cccd_callMistralAPI(base64Data, mimeType, apiKey) {
+    const prompt = `Đây là ảnh chụp màn hình gồm 2 phần:
+(1) Một đoạn text tóm tắt thông tin Căn Cước/Căn Cước Công Dân (CCCD) ở đầu ảnh, có các nhãn:
+    "Số cccd:", "Số cmnd cũ:", "Họ và tên:", "Ngày sinh:", "Giới tính:", "Địa chỉ:", "Ngày cấp mới:"
+(2) Ảnh chụp mặt trước và mặt sau thẻ Căn Cước/Căn Cước Công Dân, nếu là Căn Cước Công Dân thì mặt trước có dòng "Có giá trị đến:", nếu là Căn Cước thì mặt sau có dòng "Ngày, tháng, năm hết hạn:".
+
+Hãy đọc CHÍNH XÁC thông tin và trả về DUY NHẤT một JSON object (không giải thích gì thêm, không dùng markdown code block), với các key sau:
+{
+  "loai": "...",
+  "so_cccd": "...",
+  "so_cmnd_cu": "...",
+  "ho_va_ten": "...",
+  "ngay_sinh": "...",
+  "gioi_tinh": "...",
+  "dia_chi": "...",
+  "ngay_cap_moi": "...",
+  "co_gia_tri_den": "..."
+}
+
+Yêu cầu:
+- Giữ nguyên định dạng số/ngày tháng như trong ảnh (vd 26/07/1997), không tự suy diễn.
+- Giữ dấu tiếng Việt đầy đủ cho ho_va_ten và dia_chi.
+- Nếu không tìm thấy trường nào trong ảnh thì để giá trị là chuỗi rỗng "".
+- Ưu tiên lấy giá trị từ đoạn text tóm tắt (1) nếu có; chỉ lấy "co_gia_tri_den" từ mặt trước (nếu Loại là Căn Cước Công Dân) hoặc từ mặt sau (nếu Loại là Căn Cước) (2).
+- Trường "gioi_tinh": nếu thông tin là "Nữ" thì trả kết quả là "F", nếu thông tin là "Nam" thì trả kết quả là "M".
+- Trường "loai": xác định LOẠI giấy tờ dựa vào tiêu đề in đậm, màu đỏ, trên mặt trước thẻ ở phần ảnh (2):
+    + Nếu tiêu đề trên thẻ là "CĂN CƯỚC CÔNG DÂN" (kèm dòng tiếng Anh "Citizen Identity Card") thì trả về kết quả là "CCS QLHC VE TTXH".
+    + Nếu tiêu đề trên thẻ là "CĂN CƯỚC" (kèm dòng tiếng Anh "Identity Card", không có chữ "Công dân") thì trả về kết quả là "BO CONG AN".
+    + Nếu không xác định được thì để giá trị là chuỗi rỗng "".`;
+
+    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: 'mistral-small-latest',
+            temperature: 0,
+            response_format: { type: 'json_object' },
+            messages: [
+                {
+                    role: 'user',
+                    content: [
+                        { type: 'text', text: prompt },
+                        { type: 'image_url', image_url: { url: base64Data } }
+                    ]
+                }
+            ]
+        })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Mistral API lỗi ${response.status}: ${errorText.substring(0, 200)}`);
+    }
+
+    const data = await response.json();
+    let content = data.choices[0].message.content;
+
+    content = content.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+
+    const parsed = JSON.parse(content);
+
+    const fields = {};
+    CCCD_FIELD_KEYS.forEach(key => {
+        fields[key] = (parsed[key] || '').toString().trim();
+    });
+
+    return fields;
+}
+
+function cccd_displayResults(simpleMode) {
+    const container = document.getElementById('cccd-resultsContainer');
+    container.classList.add('active');
+
+    const total = cccd_extractedData.length;
+    const success = cccd_extractedData.filter(r => r.trang_thai === 'OK').length;
+    const failed = total - success;
+    const totalFields = cccd_extractedData.reduce((sum, r) => {
+        return sum + CCCD_FIELD_KEYS.filter(k => r[k]).length;
+    }, 0);
+
+    document.getElementById('cccd-statTotal').textContent = total;
+    document.getElementById('cccd-statSuccess').textContent = success;
+    document.getElementById('cccd-statFailed').textContent = failed;
+    document.getElementById('cccd-statFields').textContent = totalFields;
+
+    const tableHeader = document.getElementById('cccd-tableHeader');
+    const tableBody = document.getElementById('cccd-tableBody');
+
+    tableHeader.innerHTML = '';
+    tableBody.innerHTML = '';
+
+    if (simpleMode) {
+        tableHeader.innerHTML = '<th>STT</th>' + CCCD_FIELD_KEYS.map(k => `<th>${CCCD_FIELD_LABELS[k]}</th>`).join('');
+    } else {
+        tableHeader.innerHTML = '<th>STT</th><th>Tên file</th>' +
+            CCCD_FIELD_KEYS.map(k => `<th>${CCCD_FIELD_LABELS[k]}</th>`).join('') +
+            '<th>Trạng thái</th>';
+    }
+
+    cccd_extractedData.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+
+        let cells = `<td>${idx + 1}</td>`;
+
+        if (!simpleMode) {
+            cells += `<td>${escapeHtml(row.ten_file)}</td>`;
+        }
+
+        CCCD_FIELD_KEYS.forEach(key => {
+            const value = row[key];
+            cells += value ? `<td>${escapeHtml(value)}</td>` : `<td class="empty-value">-</td>`;
+        });
+
+        if (!simpleMode) {
+            const statusClass = row.trang_thai === 'OK' ? 'status-ok' :
+                row.trang_thai.startsWith('Lỗi') ? 'status-error' : 'status-warning';
+            cells += `<td class="${statusClass}">${escapeHtml(row.trang_thai)}</td>`;
+        }
+
+        tr.innerHTML = cells;
+        tableBody.appendChild(tr);
+    });
+
+    container.scrollIntoView({ behavior: 'smooth' });
+}
+
+function cccd_downloadExcel() {
+    const simpleMode = document.getElementById('cccd-simpleMode').checked;
+    let csv = '﻿';
+
+    if (simpleMode) {
+        csv += CCCD_FIELD_KEYS.map(k => CCCD_FIELD_LABELS[k]).join('\t') + '\n';
+    } else {
+        csv += ['STT', 'Tên file', ...CCCD_FIELD_KEYS.map(k => CCCD_FIELD_LABELS[k]), 'Trạng thái'].join('\t') + '\n';
+    }
+
+    cccd_extractedData.forEach((row, idx) => {
+        let values = [idx + 1];
+        if (!simpleMode) values.push(row.ten_file);
+        CCCD_FIELD_KEYS.forEach(k => values.push(row[k] || ''));
+        if (!simpleMode) values.push(row.trang_thai);
+        csv += values.map(v => `"${String(v).replace(/"/g, '""')}"`).join('\t') + '\n';
+    });
+
+    downloadFile(csv, 'cccd_ket_qua.csv', 'text/csv;charset=utf-8');
+}
+
+function cccd_downloadJSON() {
+    const json = JSON.stringify(cccd_extractedData, null, 2);
+    downloadFile(json, 'cccd_ket_qua.json', 'application/json');
+}
+
+function cccd_copyToClipboard() {
+    const simpleMode = document.getElementById('cccd-simpleMode').checked;
+    let text = '';
+
+    cccd_extractedData.forEach((row, idx) => {
+        if (simpleMode) {
+            text += CCCD_FIELD_KEYS.map(k => row[k] || '').join('\t') + '\n';
+        } else {
+            text += [idx + 1, row.ten_file, ...CCCD_FIELD_KEYS.map(k => row[k] || ''), row.trang_thai].join('\t') + '\n';
+        }
+    });
+
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Đã copy dữ liệu vào clipboard!');
+    }).catch(() => {
+        alert('Không thể copy. Vui lòng thử lại.');
+    });
+}
+
+function cccd_clearAll() {
+    cccd_selectedFiles = [];
+    cccd_extractedData = [];
+
+    document.getElementById('cccd-imageInput').value = '';
+    document.getElementById('cccd-resultsContainer').classList.remove('active');
+    document.getElementById('cccd-progressContainer').classList.remove('active');
+    document.getElementById('cccd-logContainer').style.display = 'none';
+    document.getElementById('cccd-progressFill').style.width = '0%';
+}
+
+// ==================== SMS EXTRACTION ====================
+let sms_selectedFiles = [];
+let sms_extractedData = [];
+
+document.getElementById('sms-imageInput').addEventListener('change', function(e) {
+    sms_selectedFiles = Array.from(e.target.files);
+});
+
+document.querySelectorAll('input[name="sms-engine"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.getElementById('sms-apiKeyGroup').style.display = this.value === 'mistral' ? 'block' : 'none';
+    });
+});
+
+function sms_log(message, type = 'info') {
+    const logContainer = document.getElementById('sms-logContainer');
+    logContainer.style.display = 'block';
+    const entry = document.createElement('div');
+    entry.className = `log-entry log-${type}`;
+    entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    logContainer.appendChild(entry);
+    logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+async function sms_startExtraction() {
+    if (sms_selectedFiles.length === 0) {
+        alert('Vui lòng chọn ít nhất một file ảnh!');
+        return;
+    }
+
+    const engine = document.querySelector('input[name="sms-engine"]:checked').value;
+    const tabApiKey = document.getElementById('sms-apiKey').value.trim();
+    const apiKey = getEffectiveApiKey(tabApiKey);
+    const simpleMode = document.getElementById('sms-simpleMode').checked;
+
+    if (engine === 'mistral' && !apiKey) {
+        alert('Vui lòng nhập Mistral API Key (ở mục Cấu hình chung hoặc Tab SMS)!');
+        return;
+    }
+
+    const btn = document.getElementById('sms-extractBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> Đang xử lý...';
+
+    document.getElementById('sms-progressContainer').classList.add('active');
+    document.getElementById('sms-logContainer').innerHTML = '';
+    document.getElementById('sms-logContainer').style.display = 'block';
+
+    sms_extractedData = [];
+
+    sms_log(`Bắt đầu xử lý ${sms_selectedFiles.length} ảnh với engine: ${engine}`, 'info');
+
+    for (let i = 0; i < sms_selectedFiles.length; i++) {
+        const file = sms_selectedFiles[i];
+        const progress = ((i + 1) / sms_selectedFiles.length) * 100;
+
+        document.getElementById('sms-progressFill').style.width = `${progress}%`;
+        document.getElementById('sms-progressText').textContent = `Đang xử lý: ${file.name} (${i + 1}/${sms_selectedFiles.length})`;
+
+        sms_log(`[${i + 1}/${sms_selectedFiles.length}] Xử lý: ${file.name}`, 'info');
+
+        try {
+            const result = await sms_extractFromImage(file, engine, apiKey);
+            sms_extractedData.push({
+                ten_file: file.name,
+                so_dien_thoai: result.sdt,
+                tttb: result.tttb,
+                trang_thai: result.status
+            });
+            sms_log(`✓ Thành công: ${file.name}`, 'success');
+        } catch (error) {
+            sms_extractedData.push({
+                ten_file: file.name,
+                so_dien_thoai: '',
+                tttb: '',
+                trang_thai: `Lỗi: ${error.message}`
+            });
+            sms_log(`✗ Lỗi: ${file.name} - ${error.message}`, 'error');
+        }
+    }
+
+    document.getElementById('sms-progressText').textContent = 'Hoàn thành!';
+    sms_log(`Hoàn thành xử lý ${sms_selectedFiles.length} ảnh`, 'success');
+
+    sms_displayResults(simpleMode);
+
+    btn.disabled = false;
+    btn.innerHTML = '<span>▶️</span> Bắt đầu trích xuất';
+}
+
+async function sms_extractFromImage(file, engine, apiKey) {
+    if (engine !== 'mistral') {
+        throw new Error('Tesseract cần backend server. Vui lòng sử dụng Mistral API.');
+    }
+
+    if (isPdfFile(file)) {
+        const dataUrl = await convertPdfFileToImageDataUrl(file);
+        const text = await sms_callMistralAPI(dataUrl, 'image/png', apiKey);
+        return sms_extractFields(text);
+    }
+
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const text = await sms_callMistralAPI(e.target.result, file.type, apiKey);
+                const result = sms_extractFields(text);
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            }
+        };
+        reader.onerror = () => reject(new Error('Không thể đọc file'));
+        reader.readAsDataURL(file);
+    });
+}
+
+async function sms_callMistralAPI(base64Data, mimeType, apiKey) {
+    const prompt = `Đây là ảnh chụp tin nhắn SMS trên điện thoại.
+Hãy chép lại NGUYÊN VĂN toàn bộ chữ (bao gồm số điện thoại, các dãy số, các từ 'Tttb', 'thuê bao', v.v.) xuất hiện trong ảnh, không diễn giải, không tóm tắt, không bỏ sót bất kỳ dòng nào.`;
+
+    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: 'mistral-small-latest',
+            temperature: 0,
+            messages: [
+                {
+                    role: 'user',
+                    content: [
+                        { type: 'text', text: prompt },
+                        { type: 'image_url', image_url: { url: base64Data } }
+                    ]
+                }
+            ]
+        })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Mistral API lỗi ${response.status}: ${errorText.substring(0, 200)}`);
+    }
+
+    const data = await response.json();
+    let text = data.choices[0].message.content;
+
+    if (Array.isArray(text)) {
+        text = text.map(block => block.text || '').join('\n');
+    }
+
+    return text || '';
+}
+
+function sms_extractFields(text) {
+    const source = String(text || '');
+
+    const cleanDigits = (s) => (s || '').replace(/[^0-9]/g, '');
+
+    const tttbPatterns = [
+        /tttb\s*[:\-]?\s*([0-9][0-9\s.,:/\-]{8,14}[0-9])/gi,
+        /ma\s*tttb\s*[:\-]?\s*([0-9][0-9\s.,:/\-]{8,14}[0-9])/gi,
+        /the\s*can\s*cuoc\s*[:\-]?\s*([0-9][0-9\s.,:/\-]{8,14}[0-9])/gi,
+        /so\s*giay\s*to\s*[:\-]?\s*([0-9][0-9\s.,:/\-]{8,14}[0-9])/gi,
+        /ma\s*tra\s*cuu\s*[:\-]?\s*([0-9][0-9\s.,:/\-]{8,14}[0-9])/gi,
+        /tra\s*cuu\s*[:\-]?\s*([0-9][0-9\s.,:/\-]{8,14}[0-9])/gi
+    ];
+
+    let tttb = '';
+    for (const pattern of tttbPatterns) {
+        const match = pattern.exec(source);
+        if (match) {
+            const digits = cleanDigits(match[1]);
+            if (digits.length >= 9 && digits.length <= 15) {
+                tttb = digits;
+                break;
+            }
+        }
+    }
+
+    const sdtPatterns = [
+        /so\s*thue\s*bao\s*dang\s*ky\s*[:\-]?\s*([0-9][0-9\s.,\-]{8,10})/gi,
+        /thue\s*bao\s*[:\-]\s*([0-9][0-9\s.,\-]{8,10})/gi,
+        /thue\s*bao\s*so\s*([0-9][0-9\s.,\-]{8,10})/gi,
+        /\b(0(?:3|5|7|8|9)\d{8})\b/g
+    ];
+
+    let sdt = '';
+    for (const pattern of sdtPatterns) {
+        const matches = source.match(pattern);
+        if (matches) {
+            const numMatch = matches[0].match(/\d{9,11}/);
+            if (numMatch && numMatch[0] !== tttb) {
+                sdt = numMatch[0];
+                break;
+            }
+        }
+    }
+
+    if (!tttb) {
+        const candidates = source.match(/\b\d{9}\b/g) || [];
+        if (candidates.length) {
+            tttb = candidates.find(c => c !== sdt) || candidates[0];
+        }
+    }
+
+    const status = (sdt || tttb) ? 'OK' : 'Không tìm thấy dữ liệu';
+
+    return { sdt, tttb, status };
+}
+
+function sms_displayResults(simpleMode) {
+    const container = document.getElementById('sms-resultsContainer');
+    container.classList.add('active');
+
+    const total = sms_extractedData.length;
+    const success = sms_extractedData.filter(r => r.trang_thai === 'OK').length;
+    const failed = total - success;
+    const sdtCount = sms_extractedData.filter(r => r.so_dien_thoai).length;
+    const tttbCount = sms_extractedData.filter(r => r.tttb).length;
+
+    document.getElementById('sms-statTotal').textContent = total;
+    document.getElementById('sms-statSuccess').textContent = success;
+    document.getElementById('sms-statFailed').textContent = failed;
+    document.getElementById('sms-statSDT').textContent = sdtCount;
+    document.getElementById('sms-statTTTB').textContent = tttbCount;
+
+    const tableHeader = document.getElementById('sms-tableHeader');
+    const tableBody = document.getElementById('sms-tableBody');
+
+    tableHeader.innerHTML = '';
+    tableBody.innerHTML = '';
+
+    if (simpleMode) {
+        tableHeader.innerHTML = '<th>STT</th><th>Số điện thoại</th><th>TTTB</th>';
+    } else {
+        tableHeader.innerHTML = '<th>STT</th><th>Tên file</th><th>Số điện thoại</th><th>TTTB</th><th>Trạng thái</th>';
+    }
+
+    sms_extractedData.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+
+        let cells = `<td>${idx + 1}</td>`;
+
+        if (!simpleMode) {
+            cells += `<td>${escapeHtml(row.ten_file)}</td>`;
+        }
+
+        cells += `<td>${row.so_dien_thoai ? escapeHtml(row.so_dien_thoai) : '<span class="empty-value">-</span>'}</td>`;
+        cells += `<td>${row.tttb ? escapeHtml(row.tttb) : '<span class="empty-value">-</span>'}</td>`;
+
+        if (!simpleMode) {
+            const statusClass = row.trang_thai === 'OK' ? 'status-ok' :
+                row.trang_thai.startsWith('Lỗi') ? 'status-error' : 'status-warning';
+            cells += `<td class="${statusClass}">${escapeHtml(row.trang_thai)}</td>`;
+        }
+
+        tr.innerHTML = cells;
+        tableBody.appendChild(tr);
+    });
+
+    container.scrollIntoView({ behavior: 'smooth' });
+}
+
+function sms_downloadExcel() {
+    const simpleMode = document.getElementById('sms-simpleMode').checked;
+    let csv = '﻿';
+
+    if (simpleMode) {
+        csv += 'Số điện thoại\tTTTB\n';
+    } else {
+        csv += 'STT\tTên file\tSố điện thoại\tTTTB\tTrạng thái\n';
+    }
+
+    sms_extractedData.forEach((row, idx) => {
+        if (simpleMode) {
+            csv += `${row.so_dien_thoai || ''}\t${row.tttb || ''}\n`;
+        } else {
+            csv += `${idx + 1}\t${row.ten_file}\t${row.so_dien_thoai || ''}\t${row.tttb || ''}\t${row.trang_thai}\n`;
+        }
+    });
+
+    downloadFile(csv, 'sms_ket_qua.csv', 'text/csv;charset=utf-8');
+}
+
+function sms_downloadJSON() {
+    const json = JSON.stringify(sms_extractedData, null, 2);
+    downloadFile(json, 'sms_ket_qua.json', 'application/json');
+}
+
+function sms_copyToClipboard() {
+    const simpleMode = document.getElementById('sms-simpleMode').checked;
+    let text = '';
+
+    sms_extractedData.forEach((row, idx) => {
+        if (simpleMode) {
+            text += `${row.so_dien_thoai || ''}\t${row.tttb || ''}\n`;
+        } else {
+            text += `${idx + 1}\t${row.ten_file}\t${row.so_dien_thoai || ''}\t${row.tttb || ''}\t${row.trang_thai}\n`;
+        }
+    });
+
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Đã copy dữ liệu vào clipboard!');
+    }).catch(() => {
+        alert('Không thể copy. Vui lòng thử lại.');
+    });
+}
+
+function sms_clearAll() {
+    sms_selectedFiles = [];
+    sms_extractedData = [];
+
+    document.getElementById('sms-imageInput').value = '';
+    document.getElementById('sms-resultsContainer').classList.remove('active');
+    document.getElementById('sms-progressContainer').classList.remove('active');
+    document.getElementById('sms-logContainer').style.display = 'none';
+    document.getElementById('sms-progressFill').style.width = '0%';
+}
+
+// ==================== MERGE DATA ====================
+let merge_smsData = [];
+let merge_cccdData = [];
+let merge_mergedData = [];
+
+// Toggle data source functions
+function toggleSmsDataSource() {
+    const useTabData = document.getElementById('merge-useSmsTabData').checked;
+    const fileContainer = document.getElementById('merge-smsFileContainer');
+    const fileInput = document.getElementById('merge-smsFile');
+
+    if (useTabData) {
+        fileContainer.style.opacity = '0.5';
+        fileContainer.style.pointerEvents = 'none';
+        fileInput.disabled = true;
+
+        // Load data from SMS tab
+        if (sms_extractedData.length > 0) {
+            merge_smsData = [...sms_extractedData];
+            document.getElementById('merge-smsFileInfo').innerHTML =
+                `<span class="file-loaded">✓ Đã lấy từ Tab SMS: ${merge_smsData.length} bản ghi</span>`;
+        } else {
+            merge_smsData = [];
+            document.getElementById('merge-smsFileInfo').innerHTML =
+                `<span class="status-error">⚠️ Chưa có dữ liệu ở Tab SMS. Vui lòng trích xuất dữ liệu trước.</span>`;
+        }
+    } else {
+        fileContainer.style.opacity = '1';
+        fileContainer.style.pointerEvents = 'auto';
+        fileInput.disabled = false;
+        merge_smsData = [];
+        document.getElementById('merge-smsFileInfo').textContent = 'Chưa có dữ liệu';
+    }
+}
+
+function toggleCccdDataSource() {
+    const useTabData = document.getElementById('merge-useCccdTabData').checked;
+    const fileContainer = document.getElementById('merge-cccdFileContainer');
+    const fileInput = document.getElementById('merge-cccdFile');
+
+    if (useTabData) {
+        fileContainer.style.opacity = '0.5';
+        fileContainer.style.pointerEvents = 'none';
+        fileInput.disabled = true;
+
+        // Load data from CCCD tab
+        if (cccd_extractedData.length > 0) {
+            merge_cccdData = [...cccd_extractedData];
+            document.getElementById('merge-cccdFileInfo').innerHTML =
+                `<span class="file-loaded">✓ Đã lấy từ Tab CCCD: ${merge_cccdData.length} bản ghi</span>`;
+        } else {
+            merge_cccdData = [];
+            document.getElementById('merge-cccdFileInfo').innerHTML =
+                `<span class="status-error">⚠️ Chưa có dữ liệu ở Tab CCCD. Vui lòng trích xuất dữ liệu trước.</span>`;
+        }
+    } else {
+        fileContainer.style.opacity = '1';
+        fileContainer.style.pointerEvents = 'auto';
+        fileInput.disabled = false;
+        merge_cccdData = [];
+        document.getElementById('merge-cccdFileInfo').textContent = 'Chưa có dữ liệu';
+    }
+}
+
+document.getElementById('merge-smsFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            merge_smsData = JSON.parse(event.target.result);
+            document.getElementById('merge-smsFileInfo').innerHTML =
+                `<span class="file-loaded">✓ Đã tải: ${file.name} (${merge_smsData.length} bản ghi)</span>`;
+            merge_log(`Đã tải file SMS: ${file.name} - ${merge_smsData.length} bản ghi`, 'success');
+        } catch (err) {
+            document.getElementById('merge-smsFileInfo').innerHTML =
+                `<span class="status-error">Lỗi đọc file: ${err.message}</span>`;
+            merge_log(`Lỗi đọc file SMS: ${err.message}`, 'error');
+        }
+    };
+    reader.readAsText(file);
+});
+
+document.getElementById('merge-cccdFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            merge_cccdData = JSON.parse(event.target.result);
+            document.getElementById('merge-cccdFileInfo').innerHTML =
+                `<span class="file-loaded">✓ Đã tải: ${file.name} (${merge_cccdData.length} bản ghi)</span>`;
+            merge_log(`Đã tải file CCCD: ${file.name} - ${merge_cccdData.length} bản ghi`, 'success');
+        } catch (err) {
+            document.getElementById('merge-cccdFileInfo').innerHTML =
+                `<span class="status-error">Lỗi đọc file: ${err.message}</span>`;
+            merge_log(`Lỗi đọc file CCCD: ${err.message}`, 'error');
+        }
+    };
+    reader.readAsText(file);
+});
+
+function merge_log(message, type = 'info') {
+    const logContainer = document.getElementById('merge-logContainer');
+    logContainer.style.display = 'block';
+    const entry = document.createElement('div');
+    entry.className = `log-entry log-${type}`;
+    entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    logContainer.appendChild(entry);
+    logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+function publishMergeData() {
+    const time = Date.now();
+    const self = window;
+    const parent = window.parent;
+    try {
+        self.__atmMergeData = merge_mergedData;
+        self.__atmMergeDataTime = time;
+    } catch (e) { }
+    if (parent !== self) {
+        try {
+            parent.__atmMergeData = merge_mergedData;
+            parent.__atmMergeDataTime = time;
+        } catch (e) { }
+        try {
+            parent.postMessage({ type: 'ATM_SET_MERGE_DATA', payload: merge_mergedData, time: time }, '*');
+        } catch (e) { }
+    }
+    try {
+        localStorage.setItem('__atmMergeData', JSON.stringify(merge_mergedData));
+        localStorage.setItem('__atmMergeDataTime', String(time));
+    } catch (e) { }
+}
+
+function normalizeNumber(value) {
+    if (!value) return '';
+    return String(value).replace(/[^0-9]/g, '');
+}
+
+function merge_mergeData() {
+    if (merge_smsData.length === 0) {
+        alert('Vui lòng chọn file SMS hoặc tích chọn "Lấy dữ liệu từ Tab SMS"!');
+        return;
+    }
+
+    if (merge_cccdData.length === 0) {
+        alert('Vui lòng chọn file CCCD hoặc tích chọn "Lấy dữ liệu từ Tab CCCD"!');
+        return;
+    }
+
+    document.getElementById('merge-logContainer').style.display = 'block';
+    document.getElementById('merge-logContainer').innerHTML = '';
+
+    merge_log('Bắt đầu ghép dữ liệu...', 'info');
+
+    const phoneMap = {};
+    let matchedCount = 0;
+
+    merge_smsData.forEach((row, idx) => {
+        const tttb = normalizeNumber(row.tttb);
+        const sdt = row.so_dien_thoai || '';
+
+        if (tttb && sdt) {
+            if (!phoneMap[tttb]) {
+                phoneMap[tttb] = [];
+            }
+            phoneMap[tttb].push(sdt);
+        }
+    });
+
+    merge_log(`Đã tạo map từ ${Object.keys(phoneMap).length} TTTB trong file SMS`, 'info');
+
+    merge_mergedData = merge_cccdData.map((row, idx) => {
+        const so_cccd = normalizeNumber(row.so_cccd);
+        const so_cmnd_cu = normalizeNumber(row.so_cmnd_cu);
+
+        let matchedPhones = [];
+
+        if (so_cccd && phoneMap[so_cccd]) {
+            matchedPhones = phoneMap[so_cccd];
+        } else if (so_cmnd_cu && phoneMap[so_cmnd_cu]) {
+            matchedPhones = phoneMap[so_cmnd_cu];
+        }
+
+        const sdt = matchedPhones.length > 0 ? [...new Set(matchedPhones)].join('; ') : '';
+        const trang_thai = matchedPhones.length > 0 ? 'OK' : 'Không tìm thấy SĐT';
+
+        if (matchedPhones.length > 0) {
+            matchedCount++;
+        }
+
+        return {
+            ...row,
+            so_dien_thoai: sdt,
+            trang_thai: trang_thai
+        };
+    });
+
+    merge_log(`Ghép xong: ${matchedCount}/${merge_cccdData.length} dòng có SĐT`, 'success');
+
+    publishMergeData();
+
+    const unmatchedCount = merge_cccdData.length - matchedCount;
+    document.getElementById('merge-statTotal').textContent = merge_cccdData.length;
+    document.getElementById('merge-statMatched').textContent = matchedCount;
+    document.getElementById('merge-statUnmatched').textContent = unmatchedCount;
+
+    merge_displayResults();
+
+    document.getElementById('merge-resultsContainer').classList.add('active');
+    document.getElementById('merge-resultsContainer').scrollIntoView({ behavior: 'smooth' });
+}
+
+function merge_displayResults() {
+    const tableBody = document.getElementById('merge-tableBody');
+    const showMatchedOnly = document.getElementById('merge-showMatchedOnly').checked;
+
+    tableBody.innerHTML = '';
+
+    let displayIndex = 0;
+    merge_mergedData.forEach((row, idx) => {
+        if (showMatchedOnly && !row.so_dien_thoai) {
+            return;
+        }
+
+        displayIndex++;
+        const tr = document.createElement('tr');
+
+        let cells = `<td>${displayIndex}</td>`;
+        cells += `<td>${escapeHtml(row.ten_file || '')}</td>`;
+
+        CCCD_FIELD_KEYS.forEach(key => {
+            const value = row[key];
+            cells += value ? `<td>${escapeHtml(value)}</td>` : `<td class="empty-value">-</td>`;
+        });
+
+        if (row.so_dien_thoai) {
+            cells += `<td class="status-ok">${escapeHtml(row.so_dien_thoai)}</td>`;
+        } else {
+            cells += `<td class="empty-value">-</td>`;
+        }
+
+        const statusClass = row.trang_thai === 'OK' ? 'status-ok' : 'status-warning';
+        cells += `<td class="${statusClass}">${escapeHtml(row.trang_thai)}</td>`;
+
+        tr.innerHTML = cells;
+        tableBody.appendChild(tr);
+    });
+}
+
+document.getElementById('merge-showMatchedOnly').addEventListener('change', merge_displayResults);
+
+function merge_downloadExcel() {
+    if (merge_mergedData.length === 0) {
+        alert('Chưa có dữ liệu để xuất!');
+        return;
+    }
+
+    const showMatchedOnly = document.getElementById('merge-showMatchedOnly').checked;
+
+    const headers = ['STT', 'Tên file', ...CCCD_FIELD_KEYS.map(k => CCCD_FIELD_LABELS[k]), 'Số điện thoại', 'Trạng thái'];
+    const rows = [headers];
+
+    let displayIndex = 0;
+    merge_mergedData.forEach((row, idx) => {
+        if (showMatchedOnly && !row.so_dien_thoai) {
+            return;
+        }
+
+        displayIndex++;
+        const rowData = [
+            displayIndex,
+            row.ten_file || '',
+            ...CCCD_FIELD_KEYS.map(k => row[k] || ''),
+            row.so_dien_thoai || '',
+            row.trang_thai || ''
+        ];
+        rows.push(rowData);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+
+    const colWidths = [6, 20, 18, 15, 15, 20, 12, 10, 30, 12, 12, 15, 15];
+    ws['!cols'] = colWidths.map(w => ({ wch: w }));
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Ket qua');
+
+    XLSX.writeFile(wb, 'cccd_sms_ghep.xlsx');
+    merge_log('Đã xuất file Excel: cccd_sms_ghep.xlsx', 'success');
+}
+
+function merge_downloadJSON() {
+    if (merge_mergedData.length === 0) {
+        alert('Chưa có dữ liệu để xuất!');
+        return;
+    }
+
+    const showMatchedOnly = document.getElementById('merge-showMatchedOnly').checked;
+    const dataToExport = showMatchedOnly
+        ? merge_mergedData.filter(r => r.so_dien_thoai)
+        : merge_mergedData;
+
+    const json = JSON.stringify(dataToExport, null, 2);
+    downloadFile(json, 'cccd_sms_ghep.json', 'application/json');
+
+    merge_log('Đã xuất file JSON: cccd_sms_ghep.json', 'success');
+}
+
+function merge_copyToClipboard() {
+    if (merge_mergedData.length === 0) {
+        alert('Chưa có dữ liệu để copy!');
+        return;
+    }
+
+    const showMatchedOnly = document.getElementById('merge-showMatchedOnly').checked;
+    const headers = ['STT', 'Tên file', ...CCCD_FIELD_KEYS.map(k => CCCD_FIELD_LABELS[k]), 'SĐT', 'Trạng thái'];
+
+    let text = headers.join('\t') + '\n';
+
+    let displayIndex = 0;
+    merge_mergedData.forEach((row, idx) => {
+        if (showMatchedOnly && !row.so_dien_thoai) {
+            return;
+        }
+
+        displayIndex++;
+        const rowData = [
+            displayIndex,
+            row.ten_file || '',
+            ...CCCD_FIELD_KEYS.map(k => row[k] || ''),
+            row.so_dien_thoai || '',
+            row.trang_thai || ''
+        ];
+        text += rowData.join('\t') + '\n';
+    });
+
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Đã copy dữ liệu vào clipboard!');
+        merge_log('Đã copy dữ liệu vào clipboard', 'success');
+    }).catch(() => {
+        alert('Không thể copy. Vui lòng thử lại.');
+    });
+}
+
+function merge_clearAll() {
+    merge_smsData = [];
+    merge_cccdData = [];
+    merge_mergedData = [];
+
+    document.getElementById('merge-useSmsTabData').checked = false;
+    document.getElementById('merge-useCccdTabData').checked = false;
+    document.getElementById('merge-smsFile').value = '';
+    document.getElementById('merge-cccdFile').value = '';
+    document.getElementById('merge-smsFile').disabled = false;
+    document.getElementById('merge-cccdFile').disabled = false;
+    document.getElementById('merge-smsFileContainer').style.opacity = '1';
+    document.getElementById('merge-smsFileContainer').style.pointerEvents = 'auto';
+    document.getElementById('merge-cccdFileContainer').style.opacity = '1';
+    document.getElementById('merge-cccdFileContainer').style.pointerEvents = 'auto';
+    document.getElementById('merge-smsFileInfo').textContent = 'Chưa có dữ liệu';
+    document.getElementById('merge-cccdFileInfo').textContent = 'Chưa có dữ liệu';
+    document.getElementById('merge-resultsContainer').classList.remove('active');
+    document.getElementById('merge-logContainer').style.display = 'none';
+    document.getElementById('merge-showMatchedOnly').checked = false;
+
+    publishMergeData();
+}
+</script>
+</body>
+</html>
